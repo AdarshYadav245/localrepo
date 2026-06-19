@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignBridge — Real-Time Sign Language Translator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon" aria-hidden="true">✋</span>
+      <span class="logo-text">SignBridge</span>
+    </div>
+    <nav class="nav">
+      <a href="#how-it-works">How it works</a>
+      <a href="#alphabet">Alphabet</a>
+    </nav>
+    <div class="status-badge" id="statusBadge">
+      <span class="status-dot"></span>
+      <span id="statusText">Initializing…</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <h1>Real-Time Sign Language Translator</h1>
+      <p class="hero-sub">
+        Point your camera at ASL hand signs and watch them translate to text instantly.
+        Built for accessibility and communication.
+      </p>
+    </section>
+
+    <section class="workspace">
+      <div class="camera-panel">
+        <div class="camera-wrapper">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div class="camera-placeholder" id="cameraPlaceholder">
+            <div class="placeholder-icon">📷</div>
+            <p>Camera feed will appear here</p>
+          </div>
+        </div>
+        <div class="camera-controls">
+          <button class="btn btn-primary" id="startBtn">
+            <span class="btn-icon">▶</span> Start Camera
+          </button>
+          <button class="btn btn-secondary" id="stopBtn" disabled>
+            <span class="btn-icon">■</span> Stop
+          </button>
+          <button class="btn btn-ghost" id="clearBtn">
+            Clear Text
+          </button>
+        </div>
+        <div class="detection-info">
+          <div class="info-chip">
+            <span class="chip-label">Detected</span>
+            <span class="chip-value" id="currentLetter">—</span>
+          </div>
+          <div class="info-chip">
+            <span class="chip-label">Confidence</span>
+            <span class="chip-value" id="confidence">—</span>
+          </div>
+          <div class="info-chip">
+            <span class="chip-label">FPS</span>
+            <span class="chip-value" id="fps">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="output-panel">
+        <div class="panel-header">
+          <h2>Translated Text</h2>
+          <div class="panel-actions">
+            <button class="btn-icon-only" id="copyBtn" title="Copy text" aria-label="Copy text">
+              📋
+            </button>
+            <button class="btn-icon-only" id="speakBtn" title="Speak text" aria-label="Speak text">
+              🔊
+            </button>
+          </div>
+        </div>
+        <div class="text-output" id="textOutput" aria-live="polite">
+          <span class="placeholder-text">Your translated text will appear here…</span>
+        </div>
+        <div class="word-suggestions" id="wordSuggestions"></div>
+        <div class="settings-row">
+          <label class="toggle">
+            <input type="checkbox" id="autoSpace" checked>
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">Auto-add letter on hold</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showLandmarks" checked>
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">Show hand landmarks</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="how-it-works">
+      <h2>How It Works</h2>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-num">01</div>
+          <h3>Camera Capture</h3>
+          <p>Your webcam captures hand movements in real time with low latency processing.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-num">02</div>
+          <h3>Hand Tracking</h3>
+          <p>MediaPipe detects 21 hand landmarks per frame for precise gesture analysis.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-num">03</div>
+          <h3>ASL Recognition</h3>
+          <p>Geometric rules classify ASL alphabet signs and build translated text on screen.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-num">04</div>
+          <h3>Speak & Share</h3>
+          <p>Copy or speak the translated text aloud using built-in browser speech synthesis.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="alphabet-section" id="alphabet">
+      <h2>ASL Alphabet Reference</h2>
+      <p class="section-desc">Use these hand shapes in front of your camera. Hold steady for ~1 second to add a letter.</p>
+      <div class="alphabet-chart-card">
+        <img
+          src="assets/asl-alphabet-reference.png"
+          alt="ASL manual alphabet chart showing all 26 letter hand signs from A to Z"
+          class="alphabet-chart-img"
+          loading="lazy"
+        />
+        <p class="chart-caption">Full ASL finger spelling alphabet — practice each sign before using the translator.</p>
+      </div>
+      <h3 class="alphabet-grid-title">Each letter</h3>
+      <div class="alphabet-grid" id="alphabetGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>SignBridge — Real-Time Sign Language Translator</p>
+    <p class="footer-note">ASL finger spelling recognition · Works best with good lighting and a plain background</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>
